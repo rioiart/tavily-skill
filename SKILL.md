@@ -1,6 +1,6 @@
 ---
 name: tavily-researcher
-description: Web research using Tavily APIs. Search the web, extract content from URLs, crawl websites, or get AI-synthesized research reports with citations. Use for factual research, current events, financial data, full content extraction, site crawling, or comprehensive research reports. Topics: general, news, finance.
+description: Web research using Tavily APIs. Search the web, extract content from URLs, discover site URLs via sitemap, or get AI-synthesized research reports with citations. Use for factual research, current events, financial data, full content extraction, site URL discovery, or comprehensive research reports. Topics: general, news, finance.
 metadata:
   {
     "openclaw":
@@ -24,7 +24,7 @@ metadata:
 
 # Tavily Researcher
 
-Web research via Tavily's LLM-optimized APIs: search, extract, crawl, and research.
+Web research via Tavily's LLM-optimized APIs: search, extract, sitemap, and research.
 
 ## Setup
 
@@ -36,7 +36,6 @@ Requires `TAVILY_API_KEY` environment variable. Get a free key (1000 credits/mon
 |------|--------|
 | Web search results | `tavily_search.py` |
 | Content from specific URLs | `tavily_extract.py` |
-| Crawl an entire site | `tavily_crawl.py` |
 | Discover URLs on a site (fast) | `tavily_sitemap.py` |
 | AI-synthesized report with citations | `tavily_research.py` |
 
@@ -57,14 +56,9 @@ uv run scripts/tavily_search.py "AI regulation updates" --topic news --time-rang
 uv run scripts/tavily_extract.py https://example.com/article1 https://example.com/article2
 ```
 
-### Crawl a Website
+### Discover URLs on a Site
 ```bash
-uv run scripts/tavily_crawl.py https://docs.example.com --max-depth 2 --limit 20
-```
-
-### Crawl and Save to Files
-```bash
-uv run scripts/tavily_crawl.py https://docs.example.com --max-depth 2 --output-dir ./docs
+uv run scripts/tavily_sitemap.py https://docs.example.com --max-depth 2 --limit 100
 ```
 
 ### AI Research Report
@@ -95,17 +89,6 @@ Extract full content from specific URLs (up to 20 at once).
 - `--chunks-per-source N` — Return only relevant chunks (1-5, requires --query)
 - `--format markdown|text` — Output format
 
-### `tavily_crawl.py`
-Crawl websites and extract content from multiple pages. Optionally save as local markdown files.
-
-**Key options:**
-- `--max-depth N` — Crawl depth 1-5 (start with 1)
-- `--limit N` — Total pages cap (default: 50)
-- `--instructions TEXT` — Semantic focus for relevant chunks
-- `--chunks-per-source N` — Return only relevant chunks (prevents context explosion)
-- `--select-paths` / `--exclude-paths` — Regex path filters
-- `--output-dir PATH` — Save each page as a markdown file
-
 ### `tavily_sitemap.py`
 Discover URLs on a website without extracting content. Faster than crawl — use to understand site structure first.
 
@@ -130,7 +113,7 @@ AI-synthesized research with citations. Takes 30-120 seconds.
 | Quick fact check | `tavily_search.py --include-answer` | 1 |
 | Deeper search | `tavily_search.py --depth advanced` | 2 |
 | Full article content | `tavily_extract.py <urls>` | 1 per 5 URLs |
-| Crawl a site | `tavily_crawl.py` | ~1 per 5 pages |
+| Discover site URLs | `tavily_sitemap.py` | 1 |
 | AI research report | `tavily_research.py` | varies |
 
 ## Domain-Specific Search

@@ -3,7 +3,7 @@
 Tavily Search - Web search optimized for LLMs
 
 Usage:
-    tavily_search.py <query> [options]
+    uv run scripts/tavily_search.py <query> [options]
 
 Options:
     --depth basic|advanced    Search depth (default: basic, 1 credit; advanced: 2 credits)
@@ -20,10 +20,10 @@ Environment:
     TAVILY_API_KEY            Your Tavily API key (required)
 
 Examples:
-    tavily_search.py "What is RAG in AI?"
-    tavily_search.py "latest AI news" --topic news --days 7
-    tavily_search.py "NVDA stock analysis" --topic finance --depth advanced
-    tavily_search.py "site:docs.python.org async" --include-raw-content
+    uv run scripts/tavily_search.py "What is RAG in AI?"
+    uv run scripts/tavily_search.py "latest AI news" --topic news --days 7
+    uv run scripts/tavily_search.py "NVDA stock analysis" --topic finance --depth advanced
+    uv run scripts/tavily_search.py "site:docs.python.org async" --include-raw-content
 """
 
 import argparse

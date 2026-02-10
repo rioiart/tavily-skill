@@ -3,7 +3,7 @@
 Tavily Extract - Extract full content from URLs
 
 Usage:
-    tavily_extract.py <url1> [url2 ...] [options]
+    uv run scripts/tavily_extract.py <url1> [url2 ...] [options]
 
 Options:
     --depth basic|advanced    Extraction depth (default: basic)
@@ -19,9 +19,9 @@ Cost:
     - Max 20 URLs per request
 
 Examples:
-    tavily_extract.py https://example.com/article
-    tavily_extract.py url1 url2 url3 --depth advanced
-    tavily_extract.py https://docs.python.org/3/library/asyncio.html --json
+    uv run scripts/tavily_extract.py https://example.com/article
+    uv run scripts/tavily_extract.py url1 url2 url3 --depth advanced
+    uv run scripts/tavily_extract.py https://docs.python.org/3/library/asyncio.html --json
 """
 
 import argparse

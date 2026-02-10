@@ -6,7 +6,7 @@ Performs a search, then extracts full content from top results.
 Useful when you need comprehensive content, not just snippets.
 
 Usage:
-    tavily_deep_search.py <query> [options]
+    uv run scripts/tavily_deep_search.py <query> [options]
 
 Options:
     --topic general|news|finance    Search topic (default: general)
@@ -24,9 +24,9 @@ Cost:
     - Typical: 3 credits for 5 results, extracting top 3
 
 Examples:
-    tavily_deep_search.py "How does RAG work in LLMs?"
-    tavily_deep_search.py "Tesla earnings Q4 2025" --topic finance
-    tavily_deep_search.py "AI regulation news" --topic news --days 7 --extract-top 5
+    uv run scripts/tavily_deep_search.py "How does RAG work in LLMs?"
+    uv run scripts/tavily_deep_search.py "Tesla earnings Q4 2025" --topic finance
+    uv run scripts/tavily_deep_search.py "AI regulation news" --topic news --days 7 --extract-top 5
 """
 
 import argparse

@@ -1,6 +1,25 @@
 ---
 name: tavily-researcher
 description: Web research using Tavily APIs. Use for factual research, current events, financial data, or when you need full content extraction from web pages. Supports search (with AI answers), content extraction from URLs, and deep search (search + extract combined). Topics: general, news, finance.
+metadata:
+  {
+    "openclaw":
+      {
+        "emoji": "🔍",
+        "requires": { "bins": ["uv"], "env": ["TAVILY_API_KEY"] },
+        "primaryEnv": "TAVILY_API_KEY",
+        "install":
+          [
+            {
+              "id": "uv-brew",
+              "kind": "brew",
+              "formula": "uv",
+              "bins": ["uv"],
+              "label": "Install uv (brew)",
+            },
+          ],
+      },
+  }
 ---
 
 # Tavily Researcher
@@ -23,32 +42,32 @@ Requires `TAVILY_API_KEY` environment variable. Get a free key (1000 credits/mon
 
 ### Basic Search
 ```bash
-./scripts/tavily_search.py "What is retrieval augmented generation?"
+uv run scripts/tavily_search.py "What is retrieval augmented generation?"
 ```
 
 ### Search with AI Answer
 ```bash
-./scripts/tavily_search.py "How does RAG work?" --include-answer
+uv run scripts/tavily_search.py "How does RAG work?" --include-answer
 ```
 
 ### News Search (Last 7 Days)
 ```bash
-./scripts/tavily_search.py "AI regulation updates" --topic news --days 7
+uv run scripts/tavily_search.py "AI regulation updates" --topic news --days 7
 ```
 
 ### Finance Search
 ```bash
-./scripts/tavily_search.py "NVDA earnings Q4 2025" --topic finance
+uv run scripts/tavily_search.py "NVDA earnings Q4 2025" --topic finance
 ```
 
 ### Extract Full Content from URLs
 ```bash
-./scripts/tavily_extract.py https://example.com/article1 https://example.com/article2
+uv run scripts/tavily_extract.py https://example.com/article1 https://example.com/article2
 ```
 
 ### Deep Search (Search + Extract Combined)
 ```bash
-./scripts/tavily_deep_search.py "How do transformers work in NLP?" --extract-top 3
+uv run scripts/tavily_deep_search.py "How do transformers work in NLP?" --extract-top 3
 ```
 
 ## Scripts
@@ -105,10 +124,10 @@ Use `tavily_deep_search.py` when you want search + extraction in one call.
 ### Domain-Specific Research
 ```bash
 # Only search specific sites
-./scripts/tavily_search.py "async python" --include-domains docs.python.org,realpython.com
+uv run scripts/tavily_search.py "async python" --include-domains docs.python.org,realpython.com
 
 # Exclude unreliable sources
-./scripts/tavily_search.py "health advice" --exclude-domains reddit.com,quora.com
+uv run scripts/tavily_search.py "health advice" --exclude-domains reddit.com,quora.com
 ```
 
 ## API Reference

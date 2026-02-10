@@ -1,6 +1,6 @@
 ---
 name: tavily-researcher
-description: Web research using Tavily APIs. Use for factual research, current events, financial data, or when you need full content extraction from web pages. Supports search (with AI answers), content extraction from URLs, and deep search (search + extract combined). Topics: general, news, finance.
+description: Web research using Tavily APIs. Search the web, extract content from URLs, crawl websites, or get AI-synthesized research reports with citations. Use for factual research, current events, financial data, full content extraction, site crawling, or comprehensive research reports. Topics: general, news, finance.
 metadata:
   {
     "openclaw":
@@ -24,50 +24,52 @@ metadata:
 
 # Tavily Researcher
 
-Web research via Tavily's LLM-optimized search and extraction APIs.
-
-## When to Use
-
-- Factual research requiring current/accurate information
-- News and current events (use `--topic news`)
-- Financial/market data (use `--topic finance`)
-- When you need full page content, not just snippets
-- Multi-source research requiring content from several URLs
+Web research via Tavily's LLM-optimized APIs: search, extract, crawl, and research.
 
 ## Setup
 
 Requires `TAVILY_API_KEY` environment variable. Get a free key (1000 credits/month) at https://app.tavily.com
 
+## Choosing the Right Tool
+
+| Need | Script |
+|------|--------|
+| Web search results | `tavily_search.py` |
+| Content from specific URLs | `tavily_extract.py` |
+| Crawl an entire site | `tavily_crawl.py` |
+| Discover URLs on a site (fast) | `tavily_sitemap.py` |
+| AI-synthesized report with citations | `tavily_research.py` |
+
 ## Quick Start
 
-### Basic Search
+### Search
 ```bash
-uv run scripts/tavily_search.py "What is retrieval augmented generation?"
+uv run scripts/tavily_search.py "What is retrieval augmented generation?" --include-answer
 ```
 
-### Search with AI Answer
+### News Search
 ```bash
-uv run scripts/tavily_search.py "How does RAG work?" --include-answer
+uv run scripts/tavily_search.py "AI regulation updates" --topic news --time-range week
 ```
 
-### News Search (Last 7 Days)
-```bash
-uv run scripts/tavily_search.py "AI regulation updates" --topic news --days 7
-```
-
-### Finance Search
-```bash
-uv run scripts/tavily_search.py "NVDA earnings Q4 2025" --topic finance
-```
-
-### Extract Full Content from URLs
+### Extract Content from URLs
 ```bash
 uv run scripts/tavily_extract.py https://example.com/article1 https://example.com/article2
 ```
 
-### Deep Search (Search + Extract Combined)
+### Crawl a Website
 ```bash
-uv run scripts/tavily_deep_search.py "How do transformers work in NLP?" --extract-top 3
+uv run scripts/tavily_crawl.py https://docs.example.com --max-depth 2 --limit 20
+```
+
+### Crawl and Save to Files
+```bash
+uv run scripts/tavily_crawl.py https://docs.example.com --max-depth 2 --output-dir ./docs
+```
+
+### AI Research Report
+```bash
+uv run scripts/tavily_research.py "Compare LangGraph vs CrewAI for multi-agent systems" --model pro
 ```
 
 ## Scripts
@@ -76,52 +78,62 @@ uv run scripts/tavily_deep_search.py "How do transformers work in NLP?" --extrac
 Standard web search. Returns titles, URLs, snippets, and optional AI answer.
 
 **Key options:**
-- `--depth basic|advanced` — Advanced gets deeper results (2 credits vs 1)
+- `--depth ultra-fast|fast|basic|advanced` — Trade speed for relevance
 - `--topic general|news|finance` — Optimize for content type
 - `--include-answer` — Get AI-generated summary
-- `--include-raw-content` — Get full page content (not just snippets)
-- `--days N` — Filter by recency (news/finance only)
+- `--include-raw-content` — Get full page content
+- `--time-range day|week|month|year` — Filter by recency
+- `--chunks-per-source N` — Chunks per source (1-5, advanced/fast)
 - `--include-domains` / `--exclude-domains` — Filter sources
 
 ### `tavily_extract.py`
 Extract full content from specific URLs (up to 20 at once).
 
-**Use when:**
-- You already know which URLs have the info
-- Search snippets aren't enough
-- You need to analyze full articles
+**Key options:**
+- `--depth basic|advanced` — Use advanced for JS-heavy pages
+- `--query TEXT` — Rerank chunks by relevance
+- `--chunks-per-source N` — Return only relevant chunks (1-5, requires --query)
+- `--format markdown|text` — Output format
 
-### `tavily_deep_search.py`
-Combined workflow: search → extract top results.
+### `tavily_crawl.py`
+Crawl websites and extract content from multiple pages. Optionally save as local markdown files.
 
-**Use when:**
-- You need comprehensive research on a topic
-- Snippets aren't sufficient
-- You want both search results and full content
+**Key options:**
+- `--max-depth N` — Crawl depth 1-5 (start with 1)
+- `--limit N` — Total pages cap (default: 50)
+- `--instructions TEXT` — Semantic focus for relevant chunks
+- `--chunks-per-source N` — Return only relevant chunks (prevents context explosion)
+- `--select-paths` / `--exclude-paths` — Regex path filters
+- `--output-dir PATH` — Save each page as a markdown file
 
-**Cost:** ~3 credits (2 for advanced search + 1 for extracting 3 URLs)
+### `tavily_sitemap.py`
+Discover URLs on a website without extracting content. Faster than crawl — use to understand site structure first.
+
+**Key options:**
+- `--max-depth N` — Crawl depth 1-5 (start with 1)
+- `--limit N` — Total URLs cap (default: 50)
+- `--instructions TEXT` — Focus on specific types of pages
+
+### `tavily_research.py`
+AI-synthesized research with citations. Takes 30-120 seconds.
+
+**Key options:**
+- `--model mini|pro|auto` — mini for focused queries, pro for comprehensive analysis
+- `--citation-format numbered|mla|apa|chicago`
+- `--output-schema JSON` — Get structured JSON output
+- `--output-file PATH` — Save results to file
 
 ## Cost Optimization
 
 | Task | Recommended Approach | Credits |
 |------|---------------------|---------|
 | Quick fact check | `tavily_search.py --include-answer` | 1 |
-| Deeper research | `tavily_search.py --depth advanced` | 2 |
+| Deeper search | `tavily_search.py --depth advanced` | 2 |
 | Full article content | `tavily_extract.py <urls>` | 1 per 5 URLs |
-| Comprehensive research | `tavily_deep_search.py` | ~3 |
+| Crawl a site | `tavily_crawl.py` | ~1 per 5 pages |
+| AI research report | `tavily_research.py` | varies |
 
-## Common Patterns
-
-### Research Workflow
-1. Start with `tavily_search.py --include-answer` for quick overview
-2. Review results, identify promising URLs
-3. Use `tavily_extract.py` on best sources for full content
-4. Synthesize findings
-
-### One-Shot Deep Research
-Use `tavily_deep_search.py` when you want search + extraction in one call.
-
-### Domain-Specific Research
+## Domain-Specific Search
 ```bash
 # Only search specific sites
 uv run scripts/tavily_search.py "async python" --include-domains docs.python.org,realpython.com

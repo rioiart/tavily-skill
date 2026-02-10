@@ -6,12 +6,15 @@ Usage:
     uv run scripts/tavily_search.py <query> [options]
 
 Options:
-    --depth basic|advanced    Search depth (default: basic, 1 credit; advanced: 2 credits)
+    --depth DEPTH             Search depth: ultra-fast, fast, basic, advanced (default: basic)
     --topic general|news|finance    Search topic (default: general)
     --max-results N           Max results to return (default: 5)
     --include-answer          Include AI-generated answer
     --include-raw-content     Include full page content (not just snippets)
-    --days N                  Filter to last N days (news/finance only)
+    --include-images          Include image results
+    --days N                  Filter to last N days
+    --time-range RANGE        Filter: day, week, month, year
+    --chunks-per-source N     Chunks per source 1-5 (advanced/fast only)
     --include-domains d1,d2   Only search these domains
     --exclude-domains d1,d2   Exclude these domains
     --json                    Output raw JSON response
@@ -23,6 +26,7 @@ Examples:
     uv run scripts/tavily_search.py "What is RAG in AI?"
     uv run scripts/tavily_search.py "latest AI news" --topic news --days 7
     uv run scripts/tavily_search.py "NVDA stock analysis" --topic finance --depth advanced
+    uv run scripts/tavily_search.py "AI news this week" --topic news --time-range week
     uv run scripts/tavily_search.py "site:docs.python.org async" --include-raw-content
 """
 
@@ -44,12 +48,15 @@ def search(
     max_results: int = 5,
     include_answer: bool = False,
     include_raw_content: bool = False,
+    include_images: bool = False,
     days: int = None,
+    time_range: str = None,
+    chunks_per_source: int = None,
     include_domains: list = None,
     exclude_domains: list = None,
 ) -> dict:
     """Execute a Tavily search."""
-    
+
     payload = {
         "query": query,
         "search_depth": search_depth,
@@ -57,18 +64,24 @@ def search(
         "max_results": max_results,
         "include_answer": include_answer,
         "include_raw_content": include_raw_content,
+        "include_images": include_images,
     }
-    
-    if days and topic in ("news", "finance"):
+
+    if days:
         payload["days"] = days
+    if time_range:
+        payload["time_range"] = time_range
+    if chunks_per_source:
+        payload["chunks_per_source"] = chunks_per_source
     if include_domains:
         payload["include_domains"] = include_domains
     if exclude_domains:
         payload["exclude_domains"] = exclude_domains
-    
+
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}",
+        "x-client-source": "claude-code-skill",
     }
     
     req = Request(
@@ -132,8 +145,8 @@ def format_results(response: dict, show_raw: bool = False) -> str:
 def main():
     parser = argparse.ArgumentParser(description="Tavily web search for LLMs")
     parser.add_argument("query", help="Search query")
-    parser.add_argument("--depth", choices=["basic", "advanced"], default="basic",
-                        help="Search depth (default: basic)")
+    parser.add_argument("--depth", choices=["ultra-fast", "fast", "basic", "advanced"],
+                        default="basic", help="Search depth (default: basic)")
     parser.add_argument("--topic", choices=["general", "news", "finance"], default="general",
                         help="Search topic (default: general)")
     parser.add_argument("--max-results", type=int, default=5,
@@ -142,9 +155,15 @@ def main():
                         help="Include AI-generated answer")
     parser.add_argument("--include-raw-content", action="store_true",
                         help="Include full page content")
+    parser.add_argument("--include-images", action="store_true",
+                        help="Include image results")
     parser.add_argument("--days", type=int,
-                        help="Filter to last N days (news/finance only)")
-    parser.add_argument("--include-domains", 
+                        help="Filter to last N days")
+    parser.add_argument("--time-range", choices=["day", "week", "month", "year"],
+                        help="Filter by time range")
+    parser.add_argument("--chunks-per-source", type=int,
+                        help="Chunks per source 1-5 (advanced/fast only)")
+    parser.add_argument("--include-domains",
                         help="Comma-separated domains to include")
     parser.add_argument("--exclude-domains",
                         help="Comma-separated domains to exclude")
@@ -171,7 +190,10 @@ def main():
             max_results=args.max_results,
             include_answer=args.include_answer,
             include_raw_content=args.include_raw_content,
+            include_images=args.include_images,
             days=args.days,
+            time_range=args.time_range,
+            chunks_per_source=args.chunks_per_source,
             include_domains=include_domains,
             exclude_domains=exclude_domains,
         )

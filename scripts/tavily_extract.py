@@ -7,7 +7,11 @@ Usage:
 
 Options:
     --depth basic|advanced    Extraction depth (default: basic)
+    --query TEXT              Rerank chunks by relevance to query
+    --chunks-per-source N     Chunks per source 1-5 (requires --query)
+    --format markdown|text    Output format (default: markdown)
     --include-images          Include images from pages
+    --timeout N               Max wait seconds (1-60)
     --json                    Output raw JSON response
 
 Environment:
@@ -21,6 +25,7 @@ Cost:
 Examples:
     uv run scripts/tavily_extract.py https://example.com/article
     uv run scripts/tavily_extract.py url1 url2 url3 --depth advanced
+    uv run scripts/tavily_extract.py https://example.com/docs --query "authentication API" --chunks-per-source 3
     uv run scripts/tavily_extract.py https://docs.python.org/3/library/asyncio.html --json
 """
 
@@ -39,22 +44,35 @@ def extract(
     urls: list,
     api_key: str,
     extract_depth: str = "basic",
+    query: str = None,
+    chunks_per_source: int = None,
+    fmt: str = "markdown",
     include_images: bool = False,
+    timeout: float = None,
 ) -> dict:
     """Extract content from URLs using Tavily."""
-    
+
     if len(urls) > MAX_URLS:
         raise ValueError(f"Maximum {MAX_URLS} URLs per request (got {len(urls)})")
-    
+
     payload = {
         "urls": urls,
         "extract_depth": extract_depth,
+        "format": fmt,
         "include_images": include_images,
     }
-    
+
+    if query:
+        payload["query"] = query
+    if chunks_per_source:
+        payload["chunks_per_source"] = chunks_per_source
+    if timeout:
+        payload["timeout"] = timeout
+
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}",
+        "x-client-source": "claude-code-skill",
     }
     
     req = Request(
@@ -135,8 +153,16 @@ def main():
     parser.add_argument("urls", nargs="+", help="URLs to extract (max 20)")
     parser.add_argument("--depth", choices=["basic", "advanced"], default="basic",
                         help="Extraction depth (default: basic)")
+    parser.add_argument("--query",
+                        help="Rerank extracted chunks by relevance to this query")
+    parser.add_argument("--chunks-per-source", type=int,
+                        help="Chunks per source 1-5 (requires --query)")
+    parser.add_argument("--format", choices=["markdown", "text"], default="markdown",
+                        dest="fmt", help="Output format (default: markdown)")
     parser.add_argument("--include-images", action="store_true",
                         help="Include images from pages")
+    parser.add_argument("--timeout", type=float,
+                        help="Max wait seconds (1-60)")
     parser.add_argument("--json", action="store_true",
                         help="Output raw JSON")
     
@@ -157,7 +183,11 @@ def main():
             urls=args.urls,
             api_key=api_key,
             extract_depth=args.depth,
+            query=args.query,
+            chunks_per_source=args.chunks_per_source,
+            fmt=args.fmt,
             include_images=args.include_images,
+            timeout=args.timeout,
         )
         
         if args.json:

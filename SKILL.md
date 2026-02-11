@@ -1,6 +1,6 @@
 ---
 name: tavily-researcher
-description: Web research using Tavily APIs. Search the web, extract content from URLs, discover site URLs via sitemap, or get AI-synthesized research reports with citations. Use for factual research, current events, financial data, full content extraction, site URL discovery, or comprehensive research reports. Topics: general, news, finance.
+description: "Web research using Tavily APIs. Search the web, extract content from URLs, discover site URLs via sitemap, or get AI-synthesized research reports with citations. Use for factual research, current events, financial data, full content extraction, site URL discovery, or comprehensive research reports. Topics: general, news, finance."
 metadata:
   {
     "openclaw":

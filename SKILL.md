@@ -6,16 +6,16 @@ metadata:
     "openclaw":
       {
         "emoji": "🔍",
-        "requires": { "bins": ["uv"], "env": ["TAVILY_API_KEY"] },
+        "requires": { "bins": ["curl", "jq"], "env": ["TAVILY_API_KEY"] },
         "primaryEnv": "TAVILY_API_KEY",
         "install":
           [
             {
-              "id": "uv-brew",
+              "id": "jq-brew",
               "kind": "brew",
-              "formula": "uv",
-              "bins": ["uv"],
-              "label": "Install uv (brew)",
+              "formula": "jq",
+              "bins": ["jq"],
+              "label": "Install jq (brew)",
             },
           ],
       },
@@ -34,41 +34,41 @@ Requires `TAVILY_API_KEY` environment variable. Get a free key (1000 credits/mon
 
 | Need | Script |
 |------|--------|
-| Web search results | `tavily_search.py` |
-| Content from specific URLs | `tavily_extract.py` |
-| Discover URLs on a site (fast) | `tavily_sitemap.py` |
-| AI-synthesized report with citations | `tavily_research.py` |
+| Web search results | `tavily_search.sh` |
+| Content from specific URLs | `tavily_extract.sh` |
+| Discover URLs on a site (fast) | `tavily_sitemap.sh` |
+| AI-synthesized report with citations | `tavily_research.sh` |
 
 ## Quick Start
 
 ### Search
 ```bash
-uv run scripts/tavily_search.py "What is retrieval augmented generation?" --include-answer
+scripts/tavily_search.sh "What is retrieval augmented generation?" --include-answer
 ```
 
 ### News Search
 ```bash
-uv run scripts/tavily_search.py "AI regulation updates" --topic news --time-range week
+scripts/tavily_search.sh "AI regulation updates" --topic news --time-range week
 ```
 
 ### Extract Content from URLs
 ```bash
-uv run scripts/tavily_extract.py https://example.com/article1 https://example.com/article2
+scripts/tavily_extract.sh https://example.com/article1 https://example.com/article2
 ```
 
 ### Discover URLs on a Site
 ```bash
-uv run scripts/tavily_sitemap.py https://docs.example.com --max-depth 2 --limit 100
+scripts/tavily_sitemap.sh https://docs.example.com --max-depth 2 --limit 100
 ```
 
 ### AI Research Report
 ```bash
-uv run scripts/tavily_research.py "Compare LangGraph vs CrewAI for multi-agent systems" --model pro
+scripts/tavily_research.sh "Compare LangGraph vs CrewAI for multi-agent systems" --model pro
 ```
 
 ## Scripts
 
-### `tavily_search.py`
+### `tavily_search.sh`
 Standard web search. Returns titles, URLs, snippets, and optional AI answer.
 
 **Key options:**
@@ -80,7 +80,7 @@ Standard web search. Returns titles, URLs, snippets, and optional AI answer.
 - `--chunks-per-source N` — Chunks per source (1-5, advanced/fast)
 - `--include-domains` / `--exclude-domains` — Filter sources
 
-### `tavily_extract.py`
+### `tavily_extract.sh`
 Extract full content from specific URLs (up to 20 at once).
 
 **Key options:**
@@ -89,7 +89,7 @@ Extract full content from specific URLs (up to 20 at once).
 - `--chunks-per-source N` — Return only relevant chunks (1-5, requires --query)
 - `--format markdown|text` — Output format
 
-### `tavily_sitemap.py`
+### `tavily_sitemap.sh`
 Discover URLs on a website without extracting content. Faster than crawl — use to understand site structure first.
 
 **Key options:**
@@ -97,7 +97,7 @@ Discover URLs on a website without extracting content. Faster than crawl — use
 - `--limit N` — Total URLs cap (default: 50)
 - `--instructions TEXT` — Focus on specific types of pages
 
-### `tavily_research.py`
+### `tavily_research.sh`
 AI-synthesized research with citations. Takes 30-120 seconds.
 
 **Key options:**
@@ -110,19 +110,19 @@ AI-synthesized research with citations. Takes 30-120 seconds.
 
 | Task | Recommended Approach | Credits |
 |------|---------------------|---------|
-| Quick fact check | `tavily_search.py --include-answer` | 1 |
-| Deeper search | `tavily_search.py --depth advanced` | 2 |
-| Full article content | `tavily_extract.py <urls>` | 1 per 5 URLs |
-| Discover site URLs | `tavily_sitemap.py` | 1 |
-| AI research report | `tavily_research.py` | varies |
+| Quick fact check | `tavily_search.sh --include-answer` | 1 |
+| Deeper search | `tavily_search.sh --depth advanced` | 2 |
+| Full article content | `tavily_extract.sh <urls>` | 1 per 5 URLs |
+| Discover site URLs | `tavily_sitemap.sh` | 1 |
+| AI research report | `tavily_research.sh` | varies |
 
 ## Domain-Specific Search
 ```bash
 # Only search specific sites
-uv run scripts/tavily_search.py "async python" --include-domains docs.python.org,realpython.com
+scripts/tavily_search.sh "async python" --include-domains docs.python.org,realpython.com
 
 # Exclude unreliable sources
-uv run scripts/tavily_search.py "health advice" --exclude-domains reddit.com,quora.com
+scripts/tavily_search.sh "health advice" --exclude-domains reddit.com,quora.com
 ```
 
 ## API Reference
